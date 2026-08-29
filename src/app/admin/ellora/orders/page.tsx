@@ -77,27 +77,50 @@ const statusStyle = (label: string): string => {
 
 export default function ElloraOrdersPage() {
   const [detailsOrder, setDetailsOrder] = useState<ElloraManagerOrder | null>(null)
+  const [dateMode, setDateMode] = useState<"all" | "tomorrow" | "custom">("all")
+  const [customDate, setCustomDate] = useState<string>("")
+
+  const dateParam = dateMode === "all" ? "all" : dateMode === "custom" ? customDate : undefined
 
   const { data, isLoading, refetch, isFetching } = useQuery<ManagerOrdersResponse>({
-    queryKey: ["ellora-manager-orders"],
+    queryKey: ["ellora-manager-orders", dateMode, customDate],
     queryFn: async () => {
-      const response = await api.get("/admin/ellora/orders")
+      const params = dateParam ? { date: dateParam } : {}
+      const response = await api.get("/admin/ellora/orders", { params })
       return response.data
     },
   })
 
   const summary = data?.summary
   const orders = data?.orders || []
+  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "tomorrow" ? "Tomorrow" : (customDate || "Selected date")
 
   return (
     <div className="bg-gray-50 min-h-screen p-6" style={{ fontFamily: "Albert Sans" }}>
       {/* Header */}
       <div className="flex items-start justify-between mb-5 gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manager – Orders</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Orders for Tomorrow (placed before 2:00 PM today)</p>
+          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Showing: {scopeLabel}</p>
         </div>
         <div className="flex items-center gap-3">
+          <select
+            value={dateMode}
+            onChange={(e) => setDateMode(e.target.value as "all" | "tomorrow" | "custom")}
+            className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white"
+          >
+            <option value="all">All Dates</option>
+            <option value="tomorrow">Tomorrow</option>
+            <option value="custom">Specific Date</option>
+          </select>
+          {dateMode === "custom" && (
+            <input
+              type="date"
+              value={customDate}
+              onChange={(e) => setCustomDate(e.target.value)}
+              className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white"
+            />
+          )}
           <Button
             variant="outline"
             onClick={() => refetch()}
@@ -130,11 +153,11 @@ export default function ElloraOrdersPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-5">
-        <SummaryCard label="Total Orders" value={summary ? String(summary.total_orders) : "-"} suffix="for Tomorrow" />
+        <SummaryCard label="Total Orders" value={summary ? String(summary.total_orders) : "-"} suffix={scopeLabel} />
         <SummaryCard label="Total Customers" value={summary ? String(summary.total_customers) : "-"} />
         <SummaryCard label="Total Items" value={summary ? String(summary.total_items) : "-"} suffix="units" />
         <SummaryCard label="Total Order Value" value={summary ? money(summary.total_value) : "-"} />
-        <SummaryCard label="Placed Before 2:00 PM" value="Yes" valueClass="text-green-600" />
+        <SummaryCard label="Delivery Scope" value={scopeLabel} valueClass="text-green-600" />
       </div>
 
       {/* Orders table */}
@@ -155,7 +178,7 @@ export default function ElloraOrdersPage() {
               {isLoading ? (
                 <tr><td colSpan={10} className="text-center py-12 text-gray-400">Loading orders...</td></tr>
               ) : orders.length === 0 ? (
-                <tr><td colSpan={10} className="text-center py-12 text-gray-400">No orders for tomorrow yet.</td></tr>
+                <tr><td colSpan={10} className="text-center py-12 text-gray-400">No orders found.</td></tr>
               ) : orders.map((o) => (
                 <tr key={o.order_id} className="align-top hover:bg-gray-50/60">
                   <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">#{o.order_id}</td>
@@ -168,7 +191,6 @@ export default function ElloraOrdersPage() {
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-700 whitespace-nowrap">
                     {formatDate(o.delivery_date_time)}
-                    <span className="block text-xs text-gray-400">(Tomorrow)</span>
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.email || "-"}</td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.telephone || "-"}</td>
