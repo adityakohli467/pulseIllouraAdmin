@@ -136,7 +136,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="flex flex-row justify-center items-center px-4 sm:px-6 lg:px-12 xl:px-[108px] gap-4 sm:gap-8 w-full h-auto sm:h-[80px] py-4 sm:py-0 bg-white shadow-[0px_4px_15px_rgba(0,0,0,0.05)]">
+    <nav className="print:hidden flex flex-row justify-center items-center px-4 sm:px-6 lg:px-12 xl:px-[108px] gap-4 sm:gap-8 w-full h-auto sm:h-[80px] py-4 sm:py-0 bg-white shadow-[0px_4px_15px_rgba(0,0,0,0.05)]">
       <div className="flex flex-row justify-between items-center gap-4 sm:gap-8 w-full max-w-[1296px] min-h-[40px]">
         {/* Logo and Navigation */}
         <div className="flex flex-row items-center gap-3 sm:gap-[18px] flex-1">
