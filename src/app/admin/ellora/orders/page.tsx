@@ -132,8 +132,8 @@ export default function ElloraOrdersPage() {
           <Button
             variant="outline"
             onClick={() => {
-              const qs = dateParam ? `?date=${encodeURIComponent(dateParam)}` : ""
-              window.open(`/admin/ellora/orders/production-summary${qs}`, "_blank")
+              // Production sheet is always the chef's list for today's deliveries.
+              window.open(`/admin/ellora/orders/production-summary`, "_blank")
             }}
             className="flex items-center gap-2 h-11 px-5 rounded-lg border-gray-200 text-gray-700"
           >
