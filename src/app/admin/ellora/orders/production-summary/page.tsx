@@ -19,10 +19,16 @@ interface ProductionGroup {
   items: ProductionItem[]
 }
 
+interface ProductionCategoryGroup {
+  category_name: string
+  items: ProductionItem[]
+}
+
 interface ProductionSummary {
   scope: string
   total_orders: number
   products: ProductionItem[]
+  product_groups?: ProductionCategoryGroup[]
   groups: ProductionGroup[]
 }
 
@@ -128,7 +134,19 @@ function ProductionSummaryContent() {
     },
   })
 
-  const hasContent = !!data && (data.products.length > 0 || data.groups.some((g) => g.items.length > 0))
+  // Prefer the category-wise grouping from the API; fall back to a single
+  // "Products" section if an older API response is returned.
+  const productCategoryGroups: ProductionCategoryGroup[] =
+    data?.product_groups && data.product_groups.length > 0
+      ? data.product_groups
+      : data
+        ? [{ category_name: "Products", items: data.products }]
+        : []
+
+  const hasContent =
+    !!data &&
+    (productCategoryGroups.some((g) => g.items.length > 0) ||
+      data.groups.some((g) => g.items.length > 0))
 
   return (
     <div className="bg-gray-50 min-h-screen p-6 print:bg-white print:p-0" style={{ fontFamily: "Albert Sans" }}>
@@ -169,13 +187,16 @@ function ProductionSummaryContent() {
           <div className="text-center py-16 text-gray-400">No items to prepare for this scope.</div>
         ) : (
           <div>
-            <Section
-              title="Products"
-              items={data!.products}
-              keyPrefix="product"
-              completed={completed}
-              onToggle={toggle}
-            />
+            {productCategoryGroups.map((group) => (
+              <Section
+                key={`category:${group.category_name}`}
+                title={group.category_name}
+                items={group.items}
+                keyPrefix={`category:${group.category_name}`}
+                completed={completed}
+                onToggle={toggle}
+              />
+            ))}
             {data!.groups.map((group) => (
               <Section
                 key={group.group_name}

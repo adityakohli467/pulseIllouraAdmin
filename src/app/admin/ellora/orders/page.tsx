@@ -77,7 +77,7 @@ const statusStyle = (label: string): string => {
 
 export default function ElloraOrdersPage() {
   const [detailsOrder, setDetailsOrder] = useState<ElloraManagerOrder | null>(null)
-  const [dateMode, setDateMode] = useState<"all" | "tomorrow" | "custom">("all")
+  const [dateMode, setDateMode] = useState<"all" | "today" | "custom">("today")
   const [customDate, setCustomDate] = useState<string>("")
 
   const dateParam = dateMode === "all" ? "all" : dateMode === "custom" ? customDate : undefined
@@ -93,7 +93,7 @@ export default function ElloraOrdersPage() {
 
   const summary = data?.summary
   const orders = data?.orders || []
-  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "tomorrow" ? "Tomorrow" : (customDate || "Selected date")
+  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "today" ? "Today" : (customDate || "Selected date")
 
   return (
     <div className="bg-gray-50 min-h-screen p-6" style={{ fontFamily: "Albert Sans" }}>
@@ -106,11 +106,11 @@ export default function ElloraOrdersPage() {
         <div className="flex items-center gap-3">
           <select
             value={dateMode}
-            onChange={(e) => setDateMode(e.target.value as "all" | "tomorrow" | "custom")}
+            onChange={(e) => setDateMode(e.target.value as "all" | "today" | "custom")}
             className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white"
           >
             <option value="all">All Dates</option>
-            <option value="tomorrow">Tomorrow</option>
+            <option value="today">Today</option>
             <option value="custom">Specific Date</option>
           </select>
           {dateMode === "custom" && (
