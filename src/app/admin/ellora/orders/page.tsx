@@ -142,7 +142,8 @@ export default function ElloraOrdersPage() {
           </Button>
           <Button
             onClick={() => {
-              // Feature to be implemented.
+              // Labels always cover today's deliveries regardless of the filter.
+              window.open(`/admin/ellora/orders/labels`, "_blank")
             }}
             className="flex items-center gap-2 h-11 px-5 rounded-lg bg-[#243F2A] hover:bg-[#1A2E1E] text-white"
           >
