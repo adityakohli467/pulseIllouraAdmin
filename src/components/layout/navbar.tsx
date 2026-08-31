@@ -29,6 +29,22 @@ const allNavigation = [
   { name: "Coupons", href: "/admin/ellora/coupons" },
   { name: "Customers", href: "/admin/ellora/customers" },
   { name: "Reports", href: "/admin/ellora/reports" },
+  {
+    name: "Cafe Orders",
+    href: "/admin/cafe/dashboard",
+    hasDropdown: true,
+    items: [
+      { name: "Dashboard", href: "/admin/cafe/dashboard" },
+      { name: "Orders", href: "/admin/cafe/orders" },
+      { name: "Products", href: "/admin/cafe/products" },
+      { name: "Categories", href: "/admin/cafe/categories" },
+      { name: "Options", href: "/admin/cafe/options" },
+      { name: "Dietary Codes", href: "/admin/cafe/dietary-codes" },
+      { name: "Coupons", href: "/admin/cafe/coupons" },
+      { name: "Customers", href: "/admin/cafe/customers" },
+      { name: "Reports", href: "/admin/cafe/reports" },
+    ],
+  },
 ]
 
 export function Navbar() {

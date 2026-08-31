@@ -40,6 +40,19 @@ export const MENU_PERMISSIONS: Record<string, MenuPermission> = {
   '/admin/ellora/coupons': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/customers': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/reports': { allowedAuthLevels: ILLOURA_ALLOWED },
+
+  // Cafe Orders module
+  '/admin/cafe/dashboard': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/orders': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/orders/production-summary': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/orders/labels': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/products': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/categories': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/options': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/dietary-codes': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/coupons': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/customers': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/cafe/reports': { allowedAuthLevels: ILLOURA_ALLOWED },
 }
 
 /**
