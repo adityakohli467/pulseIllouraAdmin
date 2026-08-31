@@ -34,6 +34,9 @@ interface CafeManagerOrder {
   delivery_notes: string | null
   order_comment: string | null
   delivery_date_time: string
+  cafe_delivery_method?: string | null
+  cafe_time_type?: string | null
+  cafe_scheduled_time?: string | null
   order_status: number
   order_total: number | string
   status_label: string
@@ -60,6 +63,10 @@ const formatDate = (iso: string) => {
   const d = new Date(iso)
   return d.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" })
 }
+
+const methodLabel = (o: CafeManagerOrder) => (o.cafe_delivery_method === "pickup" ? "Pickup" : "Delivery")
+const fulfilTime = (o: CafeManagerOrder) =>
+  o.cafe_time_type === "scheduled" && o.cafe_scheduled_time ? o.cafe_scheduled_time : "ASAP"
 
 const statusStyle = (label: string): string => {
   switch (label) {
@@ -193,10 +200,14 @@ export default function CafeOrdersPage() {
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-700 whitespace-nowrap">
                     {formatDate(o.delivery_date_time)}
+                    <span className="block text-xs text-gray-400">{fulfilTime(o)}</span>
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.email || "-"}</td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.telephone || "-"}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600 max-w-[220px]">{o.delivery_address || "-"}</td>
+                  <td className="px-4 py-4 text-sm text-gray-600 max-w-[220px]">
+                    <span className="inline-block mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#243F2A]">{methodLabel(o)}</span>
+                    <span className="block">{o.cafe_delivery_method === "pickup" ? "Pickup from store" : (o.delivery_address || "-")}</span>
+                  </td>
                   <td className="px-4 py-4 text-sm text-gray-600 max-w-[200px]">{o.delivery_notes || o.order_comment || "-"}</td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusStyle(o.status_label)}`}>
@@ -240,9 +251,17 @@ export default function CafeOrdersPage() {
                   <p className="text-xs text-gray-400">Phone</p>
                   <p className="text-gray-800">{detailsOrder.telephone || "-"}</p>
                 </div>
+                <div>
+                  <p className="text-xs text-gray-400">Fulfilment Method</p>
+                  <p className="text-gray-800">{methodLabel(detailsOrder)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Preferred Time</p>
+                  <p className="text-gray-800">{fulfilTime(detailsOrder)}</p>
+                </div>
                 <div className="col-span-2">
-                  <p className="text-xs text-gray-400">Delivery Details</p>
-                  <p className="text-gray-800">{detailsOrder.delivery_address || "-"}</p>
+                  <p className="text-xs text-gray-400">{detailsOrder.cafe_delivery_method === "pickup" ? "Pickup" : "Delivery Details"}</p>
+                  <p className="text-gray-800">{detailsOrder.cafe_delivery_method === "pickup" ? "Pickup from store" : (detailsOrder.delivery_address || "-")}</p>
                 </div>
                 {detailsOrder.delivery_notes && (
                   <div className="col-span-2">

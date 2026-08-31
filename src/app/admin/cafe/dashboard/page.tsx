@@ -30,6 +30,9 @@ interface CafeManagerOrder {
   delivery_notes: string | null
   order_comment: string | null
   delivery_date_time: string
+  cafe_delivery_method?: string | null
+  cafe_time_type?: string | null
+  cafe_scheduled_time?: string | null
   order_status: number
   order_total: number | string
   status_label: string
@@ -125,7 +128,12 @@ export default function CafeDashboardPage() {
                 <div className="flex items-start justify-between gap-3 border-b border-dashed border-gray-200 pb-2 mb-2">
                   <div>
                     <p className="font-bold text-gray-900">Order #{o.order_id} — {o.customer_name || "-"}</p>
-                    <p className="text-xs text-gray-500">{o.delivery_address || "-"}</p>
+                    <p className="text-xs text-gray-500">
+                      <span className="font-semibold uppercase">{o.cafe_delivery_method === "pickup" ? "Pickup" : "Delivery"}</span>
+                      {" · "}
+                      {o.cafe_time_type === "scheduled" && o.cafe_scheduled_time ? o.cafe_scheduled_time : "ASAP"}
+                    </p>
+                    <p className="text-xs text-gray-500">{o.cafe_delivery_method === "pickup" ? "Pickup from store" : (o.delivery_address || "-")}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-gray-800">{o.item_count} item{o.item_count === 1 ? "" : "s"}</p>
