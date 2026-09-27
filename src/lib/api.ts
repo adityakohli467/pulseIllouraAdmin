@@ -294,8 +294,8 @@ export const costCentersAPI = {
 }
 
 export const notificationsAPI = {
-  list: (params?: any) => api.get("/admin/notifications", { params }),
-  getUnreadCount: () => api.get("/admin/notifications/unread-count"),
+  list: (params?: any) => api.get("/admin/notifications", { params: { scope: "ellora", ...params } }),
+  getUnreadCount: () => api.get("/admin/notifications/unread-count", { params: { scope: "ellora" } }),
   markAsRead: (id: number) => api.put(`/admin/notifications/${id}/read`),
   markAllAsRead: () => api.put("/admin/notifications/mark-all-read"),
 }
