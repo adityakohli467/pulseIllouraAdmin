@@ -93,7 +93,7 @@ export default function ElloraOrdersPage() {
 
   const summary = data?.summary
   const orders = data?.orders || []
-  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "today" ? "Today" : (customDate || "Selected date")
+  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "today" ? "Next delivery" : (customDate || "Selected date")
 
   return (
     <div className="bg-gray-50 min-h-screen p-6" style={{ fontFamily: "Albert Sans" }}>
@@ -110,7 +110,7 @@ export default function ElloraOrdersPage() {
             className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white"
           >
             <option value="all">All Dates</option>
-            <option value="today">Today</option>
+            <option value="today">Next Delivery</option>
             <option value="custom">Specific Date</option>
           </select>
           {dateMode === "custom" && (
