@@ -30,7 +30,6 @@ interface ElloraManagerOrder {
   customer_name: string
   email: string | null
   telephone: string | null
-  delivery_address: string | null
   delivery_notes: string | null
   order_comment: string | null
   delivery_date_time: string
@@ -171,16 +170,16 @@ export default function ElloraOrdersPage() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                {["Order ID", "Customer", "Order Details", "Delivery Date", "Email", "Phone", "Delivery Details", "Notes", "Status", "Actions"].map((h) => (
+                {["Order ID", "Customer", "Order Details", "Delivery Date", "Email", "Phone", "Notes", "Status", "Actions"].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500 whitespace-nowrap">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {isLoading ? (
-                <tr><td colSpan={10} className="text-center py-12 text-gray-400">Loading orders...</td></tr>
+                <tr><td colSpan={9} className="text-center py-12 text-gray-400">Loading orders...</td></tr>
               ) : orders.length === 0 ? (
-                <tr><td colSpan={10} className="text-center py-12 text-gray-400">No orders found.</td></tr>
+                <tr><td colSpan={9} className="text-center py-12 text-gray-400">No orders found.</td></tr>
               ) : orders.map((o) => (
                 <tr key={o.order_id} className="align-top hover:bg-gray-50/60">
                   <td className="px-4 py-4 text-sm font-semibold text-gray-900 whitespace-nowrap">#{o.order_id}</td>
@@ -196,7 +195,6 @@ export default function ElloraOrdersPage() {
                   </td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.email || "-"}</td>
                   <td className="px-4 py-4 text-sm text-gray-600 whitespace-nowrap">{o.telephone || "-"}</td>
-                  <td className="px-4 py-4 text-sm text-gray-600 max-w-[220px]">{o.delivery_address || "-"}</td>
                   <td className="px-4 py-4 text-sm text-gray-600 max-w-[200px]">{o.delivery_notes || o.order_comment || "-"}</td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusStyle(o.status_label)}`}>
@@ -239,10 +237,6 @@ export default function ElloraOrdersPage() {
                 <div>
                   <p className="text-xs text-gray-400">Phone</p>
                   <p className="text-gray-800">{detailsOrder.telephone || "-"}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-xs text-gray-400">Delivery Details</p>
-                  <p className="text-gray-800">{detailsOrder.delivery_address || "-"}</p>
                 </div>
                 {detailsOrder.delivery_notes && (
                   <div className="col-span-2">
