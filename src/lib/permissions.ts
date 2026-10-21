@@ -33,6 +33,7 @@ export const MENU_PERMISSIONS: Record<string, MenuPermission> = {
 
   '/admin/ellora/orders': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/orders/production-summary': { allowedAuthLevels: ILLOURA_ALLOWED },
+  '/admin/ellora/orders/labels': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/products': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/categories': { allowedAuthLevels: ILLOURA_ALLOWED },
   '/admin/ellora/options': { allowedAuthLevels: ILLOURA_ALLOWED },
