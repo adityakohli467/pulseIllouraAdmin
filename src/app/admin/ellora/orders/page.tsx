@@ -22,6 +22,7 @@ interface ElloraOrderItem {
   quantity: number
   price: number | string
   total: number | string
+  item_comment?: string | null
   options?: ElloraOrderItemOption[]
 }
 
@@ -92,7 +93,7 @@ export default function ElloraOrdersPage() {
 
   const summary = data?.summary
   const orders = data?.orders || []
-  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "today" ? "Next delivery" : (customDate || "Selected date")
+  const scopeLabel = dateMode === "all" ? "All dates" : dateMode === "today" ? "Today" : (customDate || "Selected date")
 
   return (
     <div className="bg-gray-50 min-h-screen p-6" style={{ fontFamily: "Albert Sans" }}>
@@ -109,7 +110,7 @@ export default function ElloraOrdersPage() {
             className="h-11 px-4 rounded-lg border border-gray-200 text-sm text-gray-700 bg-white"
           >
             <option value="all">All Dates</option>
-            <option value="today">Next Delivery</option>
+            <option value="today">Today</option>
             <option value="custom">Specific Date</option>
           </select>
           {dateMode === "custom" && (
@@ -277,6 +278,9 @@ export default function ElloraOrdersPage() {
                                 </div>
                               ))}
                             </div>
+                          )}
+                          {it.item_comment && (
+                            <div className="mt-1 text-xs text-amber-700">Note: {it.item_comment}</div>
                           )}
                         </td>
                         <td className="px-3 py-2 text-sm text-gray-800 text-right">{it.quantity}</td>

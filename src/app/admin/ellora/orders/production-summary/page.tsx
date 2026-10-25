@@ -8,10 +8,18 @@ import api from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Printer, Check, RefreshCw } from "lucide-react"
 
+interface ProductionItemComment {
+  order_id: number
+  quantity: number
+  comment: string
+  customer_name: string | null
+}
+
 interface ProductionItem {
   name: string
   quantity: number
   dietary_codes: string[]
+  comments?: ProductionItemComment[]
 }
 
 interface ProductionGroup {
@@ -51,7 +59,8 @@ function ItemRow({
   onToggle: (key: string) => void
 }) {
   return (
-    <div className={`flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 ${done ? "bg-gray-50" : "bg-white"}`}>
+    <div className={`border border-gray-200 rounded-xl px-4 py-3 ${done ? "bg-gray-50" : "bg-white"}`}>
+    <div className="flex items-center justify-between">
       <div className="flex items-center gap-3 min-w-0">
         <span className={`h-2.5 w-2.5 rounded-full flex-shrink-0 ${done ? "bg-gray-300" : "bg-teal-500"}`} />
         <input
@@ -81,6 +90,20 @@ function ItemRow({
           {done ? "Completed" : "Mark Complete"}
         </button>
       </div>
+    </div>
+    {item.comments && item.comments.length > 0 && (
+      <ul className="mt-2 ml-6 space-y-1">
+        {item.comments.map((c, i) => (
+          <li key={i} className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-md px-3 py-1.5">
+            <span className="font-semibold">
+              Order #{c.order_id}{c.customer_name ? ` (${c.customer_name})` : ""}
+              {c.quantity > 1 ? ` x${c.quantity}` : ""}:
+            </span>{" "}
+            {c.comment}
+          </li>
+        ))}
+      </ul>
+    )}
     </div>
   )
 }
