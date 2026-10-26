@@ -128,13 +128,12 @@ function LabelsContent() {
     },
   })
 
-  // Auto-open the print dialog once labels have loaded.
+  // Auto-open the print dialog once labels have loaded. No cleanup on purpose:
+  // React strict mode re-runs effects and would cancel the timer after the guard is set.
   useEffect(() => {
-    if (!printedRef.current && data && data.labels.length > 0) {
-      printedRef.current = true
-      const t = setTimeout(() => window.print(), 400)
-      return () => clearTimeout(t)
-    }
+    if (printedRef.current || !data || data.labels.length === 0) return
+    printedRef.current = true
+    setTimeout(() => window.print(), 400)
   }, [data])
 
   return (
@@ -163,7 +162,9 @@ function LabelsContent() {
         {isLoading ? (
           <div className="text-center py-16 text-gray-400">Loading labels…</div>
         ) : !data || data.labels.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">No orders to print for today.</div>
+          <div className="text-center py-16 text-gray-400">
+            No orders to print for {data?.scope && data.scope !== "all" ? data.scope : "this selection"}.
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print:grid-cols-2 print:gap-3">
             {data.labels.map((label, i) => (
