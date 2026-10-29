@@ -142,6 +142,14 @@ export const authAPI = {
   me: () => api.get("/admin/auth/me"),
 }
 
+export const mfaAPI = {
+  status: () => api.get("/admin/auth/mfa/status"),
+  setup: () => api.post("/admin/auth/mfa/setup"),
+  enable: (code: string) => api.post("/admin/auth/mfa/enable", { code }),
+  disable: (password: string, code: string) =>
+    api.post("/admin/auth/mfa/disable", { password, code }),
+}
+
 export const productsAPI = {
   list: (params?: any) => api.get("/admin/products", { params }),
   get: (id: number) => api.get(`/admin/products/${id}`),

@@ -18,7 +18,9 @@ type LoginForm = {
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const { login } = useAuthStore()
+  const [mfaToken, setMfaToken] = useState<string | null>(null)
+  const [mfaCode, setMfaCode] = useState("")
+  const { login, completeMfaLogin } = useAuthStore()
 
   const {
     register,
@@ -26,23 +28,49 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginForm>()
 
+  const finishLogin = () => {
+    toast.success("Login successful!")
+
+    // Check if there's a redirect parameter
+    const urlParams = new URLSearchParams(window.location.search)
+    const redirect = urlParams.get('redirect')
+
+    // Redirect to the original page or the Illoura orders page
+    router.push(redirect || "/admin/ellora/orders")
+  }
 
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true)
 
     try {
-      await login(data.username, data.password)
-      toast.success("Login successful!")
-
-      // Check if there's a redirect parameter
-      const urlParams = new URLSearchParams(window.location.search)
-      const redirect = urlParams.get('redirect')
-
-      // Redirect to the original page or the Illoura orders page
-      router.push(redirect || "/admin/ellora/orders")
+      const result = await login(data.username, data.password)
+      if (result.mfaRequired && result.mfaToken) {
+        setMfaToken(result.mfaToken)
+        return
+      }
+      finishLogin()
     } catch (error: any) {
       const errorMessage = error?.message || error.response?.data?.message || "Login failed. Please check your credentials."
       toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const onVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!mfaToken || !mfaCode.trim()) return
+    setIsLoading(true)
+
+    try {
+      await completeMfaLogin(mfaToken, mfaCode.trim())
+      finishLogin()
+    } catch (error: any) {
+      const message = error?.message || "Verification failed"
+      toast.error(message)
+      setMfaCode("")
+      // Challenge expired: start over from the password step
+      if (/expired|sign in again/i.test(message)) setMfaToken(null)
     } finally {
       setIsLoading(false)
     }
@@ -73,11 +101,49 @@ export default function LoginPage() {
           <div>
             <CardTitle className="text-3xl font-bold text-gray-800">Admin Portal</CardTitle>
             <CardDescription className="text-base mt-2">
-              Enter your credentials to access the dashboard
+              {mfaToken
+                ? "Enter the 6-digit code from your authenticator app, or a backup code"
+                : "Enter your credentials to access the dashboard"}
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
+          {mfaToken ? (
+            <form onSubmit={onVerify} className="space-y-5">
+              <Input
+                id="mfa-code"
+                type="text"
+                inputMode="text"
+                autoComplete="one-time-code"
+                autoFocus
+                maxLength={11}
+                placeholder="123456"
+                className="h-11 text-center tracking-widest"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button
+                type="submit"
+                className="w-full h-11 text-white font-semibold"
+                style={{ backgroundColor: '#243F2A' }}
+                disabled={isLoading || !mfaCode.trim()}
+              >
+                {isLoading ? "Verifying..." : "Verify"}
+              </Button>
+              <button
+                type="button"
+                className="w-full text-sm text-gray-500 hover:underline"
+                onClick={() => {
+                  setMfaToken(null)
+                  setMfaCode("")
+                }}
+                disabled={isLoading}
+              >
+                Back to sign in
+              </button>
+            </form>
+          ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <Input
@@ -118,6 +184,7 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
+          )}
         </CardContent>
       </Card>
     </div>

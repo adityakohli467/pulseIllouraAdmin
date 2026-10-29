@@ -64,6 +64,11 @@ export function canAccessRoute(userAuthLevel: number | undefined, route: string)
     return false
   }
 
+  // Every signed-in user can manage their own account security
+  if (route === '/security') {
+    return true
+  }
+
   const permission = MENU_PERMISSIONS[route]
 
   // If no permission defined, deny access on this portal (Illoura-only surface).

@@ -16,7 +16,8 @@ interface AuthState {
   token: string | null
   refreshToken: string | null
   isAuthenticated: boolean
-  login: (username: string, password: string) => Promise<void>
+  login: (username: string, password: string) => Promise<{ mfaRequired: boolean; mfaToken?: string }>
+  completeMfaLogin: (mfaToken: string, code: string) => Promise<void>
   logout: () => void
   checkAuth: () => Promise<void>
   refreshAccessToken: () => Promise<boolean>
@@ -24,7 +25,28 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      const applySession = (resData: any) => {
+        const newToken = resData.token || resData.accessToken || resData.data?.token || resData.data?.accessToken
+        const newRefreshToken = resData.refreshToken || resData.refresh_token || resData.data?.refreshToken || resData.data?.refresh_token
+
+        if (!newToken) throw new Error("Invalid login response format")
+
+        // Store in state and localStorage (including refresh token)
+        set({
+          user: resData.user || resData.data?.user || resData,
+          token: newToken,
+          refreshToken: newRefreshToken || null,
+          isAuthenticated: true,
+        })
+
+        // Also set a cookie for middleware (30 days expiration for persistence)
+        if (typeof document !== 'undefined') {
+          document.cookie = `caterly-auth=${newToken}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`
+        }
+      }
+
+      return {
       user: null,
       token: null,
       refreshToken: null,
@@ -38,25 +60,26 @@ export const useAuthStore = create<AuthState>()(
           })
 
           const resData = response.data
-          const newToken = resData.token || resData.accessToken || resData.data?.token || resData.data?.accessToken
-          const newRefreshToken = resData.refreshToken || resData.refresh_token || resData.data?.refreshToken || resData.data?.refresh_token
 
-          if (!newToken) throw new Error("Invalid login response format")
-
-          // Store in state and localStorage (including refresh token)
-          set({
-            user: resData.user || resData.data?.user || resData,
-            token: newToken,
-            refreshToken: newRefreshToken || null,
-            isAuthenticated: true,
-          })
-
-          // Also set a cookie for middleware (30 days expiration for persistence)
-          if (typeof document !== 'undefined') {
-            document.cookie = `caterly-auth=${newToken}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax`
+          // Second factor required: no session yet, caller must collect a code
+          if (resData.mfaRequired) {
+            return { mfaRequired: true, mfaToken: resData.mfaToken as string }
           }
+
+          applySession(resData)
+          return { mfaRequired: false }
         } catch (error: any) {
           const message = error.response?.data?.message || "Login failed"
+          throw new Error(message)
+        }
+      },
+
+      completeMfaLogin: async (mfaToken: string, code: string) => {
+        try {
+          const response = await axios.post(`${API_URL}/admin/auth/mfa/login`, { mfaToken, code })
+          applySession(response.data)
+        } catch (error: any) {
+          const message = error.response?.data?.message || "Verification failed"
           throw new Error(message)
         }
       },
@@ -165,7 +188,8 @@ export const useAuthStore = create<AuthState>()(
           get().logout()
         }
       },
-    }),
+      }
+    },
     {
       name: "caterly-auth",
     }

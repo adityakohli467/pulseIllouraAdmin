@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/store/auth"
 import { filterNavigationByPermissions } from "@/lib/permissions"
 import { notificationsAPI } from "@/lib/api"
-import { Bell, ChevronDown, User, LogOut, Menu, X } from "lucide-react"
+import { Bell, ChevronDown, User, LogOut, Menu, X, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -444,6 +444,12 @@ export function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/security">
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Security
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
